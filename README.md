@@ -8,39 +8,75 @@ GitHub Action for packaging repository.
 
 ### Output arguments
 
-|Arguments |Contents             |Required |default |
+|Arguments  |Contents             |Required |default |
 |:--:|:--:|:--:|:--:|
-|RELEASE   |Filename for release |Required |release |
-|EXCLUDES  |Excluded files       |Optional |.git    |
+|RELEASE    |Filename for release |Required |release |
+|EXCLUSIONS |Excluded files       |Optional |.git    |
 
 ## Example
 
 ```yaml:.github/workflows/ubuntu-test.yml
-name: "ubuntu-test"
+name: 'ubuntu-test'
 
 on:
   push:
     tags:
-      - "v*"
+      - 'v*'
 
 jobs:
   test_job:
     runs-on: ubuntu-latest
-    name: "demo"
+    name: 'demo'
     steps:
-      - name: "Set up Git repository"
+      - name: 'Set up Git repository'
         uses: actions/checkout@v2
 
-      - name: "info-action"
+      - name: 'info-action'
         id: info_action
         uses: k5-mot/info-action@main
 
-      - name: "package-action"
+      - name: 'package-action'
         id: package_action
         uses: k5-mot/package-action@main
         with: 
-          RELEASE:  "${{ steps.info_action.outputs.release }}"
-          EXCLUDES: ".git .vscode build release"
+          RELEASE:  'release'
+          EXCLUSIONS: '.git .vscode build' 
+          
+      - name: 'Create Release'
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+          body: |
+            ${{ steps.info_action.outputs.version }}
+          draft: false
+          prerelease: false
+    
+      - name: 'Upload Release.tar.gz'
+        id: upload_release_tar
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: release/release.tar.gz
+          asset_name: ${{ steps.info_action.outputs.release }}.tar.gz
+          asset_content_type: application/gzip
+
+      - name: 'Upload Release.zip'
+        id: upload_release_zip
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: release/release.zip
+          asset_name: ${{ steps.info_action.outputs.release }}.zip
+          asset_content_type: application/zip
+
 ```
 
 ## References
