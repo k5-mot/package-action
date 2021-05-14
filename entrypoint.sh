@@ -1,12 +1,17 @@
 #!/usr/bin/env bash 
 
+## -e : Stop if failed
+## -u : Error if exists not initialized variables 
 set -eu
 
+## Create directory for release
 mkdir -p release
-RELEASE=$1
-EXCLUSIONS=($2)
 
-## Compress .tar.gz
+## Setup variables
+RELEASE=$1
+EXCLUSIONS=($2 'release')
+
+## Compress release.tar.gz
 ARGS_TARGZ='tar'
 for S in "${EXCLUSIONS[@]}"
 do
@@ -15,7 +20,7 @@ done
 ARGS_TARGZ="${ARGS_TARGZ} -zcf release/${RELEASE}.tar.gz ."
 eval ${ARGS_TARGZ}
 
-## Compress .zip
+## Compress release.zip
 ARGS_ZIP=''
 ARGS_ZIP="zip --quiet --recurse-paths release/${RELEASE}.zip ."
 for S in "${EXCLUSIONS[@]}"
