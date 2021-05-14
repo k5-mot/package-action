@@ -1,0 +1,19 @@
+name: 'package-action'
+description: 'GitHub Action for packaging repository.'
+
+inputs:
+  RELEASE: 
+    description: 'File name for release'
+    required: true
+    default: 'release'
+  EXCLUSIONS:
+    description: 'Exclusion files'
+    required: true
+    default: '.git release'
+
+runs: 
+  using: 'docker'
+  image: 'Dockerfile'
+  args: 
+    - ${{ inputs.RELEASE }}
+    - ${{ inputs.EXCLUSIONS }}
