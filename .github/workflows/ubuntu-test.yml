@@ -22,7 +22,7 @@ jobs:
         uses: k5-mot/package-action@main
         with: 
           RELEASE:  'release'
-          EXCLUSIONS: '.git .vscode build release' 
+          EXCLUSIONS: '.git .vscode build' 
           
       - name: 'Create Release'
         id: create_release
